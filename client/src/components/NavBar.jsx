@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
     return (
-        <nav className="w-full z-50 flex items-center justify-between fixed px-16 py-5 text-white">
+        <nav className="w-full fixed z-20 flex items-center justify-between px-16  text-white">
 
             {/* Logo */}
             <div className="flex items-center gap-2">
@@ -38,9 +38,9 @@ const Navbar = () => {
                 </li>
 
                 <li>
-                    <Link to="/signup">
+                    <Link to="/login">
                         <button className="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-lg font-medium transition">
-                            Sign Up
+                            Log In
                         </button>
                     </Link>
                 </li>

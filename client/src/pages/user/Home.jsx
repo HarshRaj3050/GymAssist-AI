@@ -1,10 +1,14 @@
 import React from "react";
 import { Play } from "lucide-react";
-import bgVideo from "../assets/homePage-bgVideo.mp4";
+import bgVideo from '../../assets/homePage-bgVideo.mp4'
+import Navbar from "../../components/NavBar";
+
+import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
     <section className="relative min-h-screen text-white overflow-hidden pt-10">
+      <Navbar />
 
       {/* Background Video */}
       <video
@@ -42,9 +46,9 @@ const Home = () => {
             {/* Buttons */}
             <div className="flex items-center gap-6">
 
-              <button className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
+              <Link to='/signup' className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
                 Get Started
-              </button>
+              </Link>
 
               <div className="flex items-center gap-3 cursor-pointer">
                 <div className="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full">
