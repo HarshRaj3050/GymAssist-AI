@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_URL;
+import Silk from '../../components/animation/Silk'
 
 const Signup = () => {
 
@@ -71,32 +72,38 @@ const Signup = () => {
                 <div className="flex w-full min-h-dvh overflow-hidden shadow-2xl bg-white">
 
                     {/* Left Panel */}
-                    <div className="sm:w-[50%] hidden relative sm:flex flex-col justify-between p-9 overflow-hidden"
+                    <div className="sm:w-[50%] hidden relative sm:flex flex-col justify-between  overflow-hidden"
                         style={{ background: 'linear-gradient(135deg, #1a0a6e 0%, #2d1fc7 30%, #3a6bdb 60%, #1ecbe1 100%)' }}>
+                        <Silk
+                            speed={5}
+                            scale={1}
+                            color="#004cff"
+                            noiseIntensity={0}
+                            rotation={0}
+                        ></Silk>
+                            {/* Blobs */}
+                            <div className="absolute -top-10 -right-10 w-56 h-56 rounded-full opacity-40 blur-3xl"
+                                style={{ background: 'rgba(100,120,255,0.5)' }} />
+                            <div className="absolute bottom-16 -left-8 w-44 h-44 rounded-full blur-3xl"
+                                style={{ background: 'rgba(30,200,230,0.3)' }} />
 
-                        {/* Blobs */}
-                        <div className="absolute -top-10 -right-10 w-56 h-56 rounded-full opacity-40 blur-3xl"
-                            style={{ background: 'rgba(100,120,255,0.5)' }} />
-                        <div className="absolute bottom-16 -left-8 w-44 h-44 rounded-full blur-3xl"
-                            style={{ background: 'rgba(30,200,230,0.3)' }} />
-
-                        {/* Top Text */}
-                        <div className="relative z-10">
-                            <p className="text-white/70 text-sm mb-2">Push your limits, unlock your potential.</p>
-                            <h2 className="text-white text-2xl font-bold leading-snug">
-                                Push harder today,  <br />become stronger than yesterday.
-                            </h2>
-                        </div>
-
-                        {/* Partners */}
-                        <div className="relative z-10">
-                            <p className="text-white/50 text-xs mb-3">Our partners</p>
-                            <div className="flex flex-wrap gap-4 items-center">
-                                {['Discord', 'Instagram', 'Spotify', 'YouTube', 'TikTok'].map((name) => (
-                                    <span key={name} className="text-white/80 text-xs font-semibold">{name}</span>
-                                ))}
+                            {/* Top Text */}
+                            <div className="absolute left-10 top-10 z-10 ">
+                                <p className="text-white/70 text-sm mb-2">Push your limits, unlock your potential.</p>
+                                <h2 className="text-white text-2xl font-bold leading-snug">
+                                    Push harder today,  <br />become stronger than yesterday.
+                                </h2>
                             </div>
-                        </div>
+
+                            {/* Partners */}
+                            <div className="absolute bottom-10 left-10 z-10">
+                                <p className="text-white/50 text-xs mb-3">Our partners</p>
+                                <div className="flex flex-wrap gap-4 items-center">
+                                    {['Discord', 'Instagram', 'Spotify', 'YouTube', 'TikTok'].map((name) => (
+                                        <span key={name} className="text-white/80 text-xs font-semibold">{name}</span>
+                                    ))}
+                                </div>
+                            </div>
                     </div>
 
                     {/* Right Panel */}

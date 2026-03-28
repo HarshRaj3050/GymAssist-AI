@@ -2,6 +2,7 @@ import React from "react";
 import { Play } from "lucide-react";
 import bgVideo from '../../assets/homePage-bgVideo.mp4'
 import Navbar from "../../components/NavBar";
+import TextType from '../../components/animation/TextType';
 
 import { Link } from "react-router-dom";
 
@@ -31,11 +32,20 @@ const Home = () => {
 
           {/* LEFT CONTENT */}
           <div className="space-y-6 max-w-xl">
-
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              GET HEALTHY BODY <br />
-              WITH THE PERFECT <br />
-              EXERCISES
+            <h1 className="text-4xl h-55 md:text-5xl lg:text-6xl font-bold leading-tight">
+              <TextType
+                text={["GET HEALTHY BODY WITH THE PERFECT EXERCISES"]}
+                typingSpeed={75}
+                pauseDuration={3500}
+                showCursor
+                cursorCharacter="_"
+                texts={["Welcome to React Bits! Good to see you!", "Build some amazing experiences!"]}
+                deletingSpeed={50}
+                variableSpeedEnabled={false}
+                variableSpeedMin={60}
+                variableSpeedMax={120}
+                cursorBlinkDuration={0.5}
+              />
             </h1>
 
             <p className="text-gray-300">
