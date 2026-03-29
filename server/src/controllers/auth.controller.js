@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const sendEmail = require('../services/email.service');
 const emailService = require("../utils/otp.utils");
 const otpModel = require('../models/otp.model');
+const attendanceModel = require('../models/attendance.model');
 
 
 async function userRegister(req, res) {
@@ -77,13 +78,21 @@ async function verifyEmail(req, res) {
 
     await otpModel.deleteMany({ user: otpDoc.user });
 
+    const userId = user._id;
+    const createAttendanceRecord = await attendanceModel.create({
+        userId,
+        email: user.email,
+        attendance: new Map()
+    })
+
     return res.status(200).json({
         message: 'Email verified successfully',
         user: {
             username: user.username,
             email: user.email,
             verified: user.verified
-        }
+        },
+        attendanceModel: createAttendanceRecord
     });
 }
 

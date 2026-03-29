@@ -1,6 +1,8 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth.route');
+const userRoutes = require('./routes/user.route');
+const userAttendance = require('./routes/attendance.route');
 
 
 const cors = require("cors");
@@ -20,6 +22,8 @@ app.use(
 
 
 app.use("/api/auth", authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/attendance', userAttendance);
 app.get("/", (req, res) => {
     res.send("Server working");
 });

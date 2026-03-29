@@ -3,26 +3,14 @@ const config = require('../config/config');
 const { generateOtp } = require('../utils/otp.utils');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        type: 'OAuth2',
-        user: config.GOOGLE_USER,
-        clientId: config.GOOGLE_CLIENT_ID,
-        clientSecret: config.GOOGLE_CLIENT_SECRET,
-        refreshToken: config.GOOGLE_REFRESH_TOKEN
-    }
-})
-
-transporter.verify((err, success)=>{
-    if(err){
-        console.error('Error connecting to email service:', err);
-    } else {
-        console.log('Email service is ready to send messages');
-    }
-})
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 
-// Function to send email
 const sendEmail = async (to, subject, text, html) => {
   try {
     const info = await transporter.sendMail({
@@ -40,4 +28,5 @@ const sendEmail = async (to, subject, text, html) => {
   }
 };
 
-module.exports =  sendEmail;
+
+module.exports = sendEmail;

@@ -17,11 +17,23 @@ const userSchema = new Schema({
         type: String,
         required: [true, "Password is required"]
     },
+    height: {
+        type: Number,
+        default: null
+    },
+    weight: {
+        type: Number,
+        default: null
+    },
     verified: {
         type: Boolean,
         default: false
     },
     subscribe: {
+        type: Boolean,
+        default: false
+    },
+    subscribePlus: {
         type: Boolean,
         default: false
     }
