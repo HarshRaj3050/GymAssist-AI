@@ -10,15 +10,11 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-    cors({
-        origin: [
-            "http://localhost:5173",
-            "https://application-name.vercel.app"
-        ],
-        credentials: true
-    })
-);
+
+app.use(cors({
+  origin: "http://localhost:5173", // your React app
+  credentials: true
+}));
 
 
 app.use("/api/auth", authRoutes);

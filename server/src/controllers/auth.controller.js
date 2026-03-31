@@ -125,12 +125,12 @@ async function userLogin(req, res) {
         { expiresIn: '24h' }
     );
 
-    res.cookie('token', token, {
+    res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'None'
-    })
-
+        sameSite: "none",
+        secure: false
+    });
+    
     res.status(200).json({
         message: 'Login successful',
         token,
