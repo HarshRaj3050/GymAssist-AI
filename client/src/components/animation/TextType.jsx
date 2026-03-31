@@ -20,6 +20,10 @@ const TextType = ({
   onSentenceComplete,
   startOnVisible = false,
   reverseMode = false,
+
+  // 🔥 REMOVE THESE FROM props FLOW
+  variableSpeedMin,
+  variableSpeedMax,
   ...props
 }) => {
   const [displayedText, setDisplayedText] = useState('');

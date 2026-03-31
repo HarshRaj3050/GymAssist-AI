@@ -41,7 +41,6 @@ const Home = () => {
                 cursorCharacter="_"
                 texts={["Welcome to React Bits! Good to see you!", "Build some amazing experiences!"]}
                 deletingSpeed={50}
-                variableSpeedEnabled={false}
                 variableSpeedMin={60}
                 variableSpeedMax={120}
                 cursorBlinkDuration={0.5}

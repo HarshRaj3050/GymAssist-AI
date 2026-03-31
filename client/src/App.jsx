@@ -7,6 +7,7 @@ import Signup from './pages/auth/Signup';
 import Login from './pages/auth/Login';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import Dashboard from './pages/user/Dashboard';
+import QRScanner from './pages/user/QRScanner';
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Route path='/Dashboard' element={<Dashboard/>}></Route>
         <Route path="/" element={<Home/>} />
         <Route path="/about" element={<About/>} />
+        <Route path="/scanner" element={<QRScanner/>} />
       </Routes>
     </>
   )
