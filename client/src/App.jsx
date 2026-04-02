@@ -8,6 +8,7 @@ import Login from './pages/auth/Login';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import Dashboard from './pages/user/Dashboard';
 import QRScanner from './pages/user/QRScanner';
+import AiChat from './pages/user/AiChat'
 
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/" element={<Home/>} />
         <Route path="/about" element={<About/>} />
         <Route path="/scanner" element={<QRScanner/>} />
+        <Route path="/ai-chat" element={<AiChat />} />
       </Routes>
     </>
   )

@@ -33,7 +33,6 @@ const Login = () => {
 
         setIsLoading(true);
         setError('');
-        console.log(formData);
 
         try {
             await axios.post(`${BASE_URL}/api/auth/login`, formData, {

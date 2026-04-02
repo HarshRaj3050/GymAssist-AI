@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import DashboardNavBar from '../../components/DashboardNavBar';
 import QRScanner from "./QRScanner";
 import { useNavigate } from "react-router-dom";
 
@@ -6,17 +7,17 @@ const API = "http://localhost:3000/api/user";
 
 // ── Static mock data (replace with real API calls as needed) ───
 const STATS = [
-  { icon: "⏱️", value: "7.8", unit: "/hours", label: "Sleeping Reports", delta: "-19.87%", up: false, color: "#F5A623" },
-  { icon: "👟", value: "8260", unit: "/step", label: "Step Counter", delta: "+63.39%", up: true, color: "#7C6FFF" },
-  { icon: "🔥", value: "200", unit: "/cal", label: "Calories Burn", delta: "-58.02%", up: false, color: "#FF6B6B" },
-  { icon: "❤️", value: "160", unit: "/bpm", label: "Heart Rate Monitor", delta: "+2.87%", up: true, color: "#FF6B6B" },
+  { icon: "⏱️", value: "7.8", unit: "/hours", label: "Sleeping Reports", delta: "-19.87%", up: false, color: "#F5A623", highlight: 7 },
+  { icon: "👟", value: "8260", unit: "/step", label: "Step Counter", delta: "+63.39%", up: true, color: "#7C6FFF", highlight: 9 },
+  { icon: "🔥", value: "200", unit: "/cal", label: "Calories Burn", delta: "-58.02%", up: false, color: "#FF6B6B", highlight: 8 },
+  { icon: "❤️", value: "160", unit: "/bpm", label: "Heart Rate Monitor", delta: "+2.87%", up: true, color: "#FF6B6B", isHeart: true },
 ];
 
 const WEEKLY_GOALS = [
-  { icon: "🏋", label: "Weight Loss", value: "1kg", sub: "/120mins", color: "#FFF3E0", iconBg: "#FFAB40" },
-  { icon: "💪", label: "Push Up", value: "80", sub: "/48mins", color: "#E8F5E9", iconBg: "#66BB6A" },
-  { icon: "🧘", label: "Lower Stretch", value: "25", sub: "/20mins", color: "#EDE7F6", iconBg: "#9575CD" },
-  { icon: "🤸", label: "ABS and Stretch", value: "1kg", sub: "/80mins", color: "#E8F5E9", iconBg: "#26A69A" },
+  { icon: "🏋", label: "Weight Loss", value: "1kg", sub: "/120mins", bg: "bg-orange-50", iconBg: "bg-orange-300" },
+  { icon: "💪", label: "Push Up", value: "80", sub: "/48mins", bg: "bg-green-50", iconBg: "bg-green-300" },
+  { icon: "🧘", label: "Lower Stretch", value: "25", sub: "/20mins", bg: "bg-purple-50", iconBg: "bg-purple-300" },
+  { icon: "🤸", label: "ABS and Stretch", value: "1kg", sub: "/80mins", bg: "bg-teal-50", iconBg: "bg-teal-300" },
 ];
 
 const TRAINERS = [
@@ -26,23 +27,33 @@ const TRAINERS = [
 ];
 
 const ACTIVITIES = [
-  { label: "Ultimate Body Workout", trainer: "Robert Fox", bg: "#FFF8F0", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=200&q=70" },
-  { label: "Body Weight Workout", trainer: "Jacob Jones", bg: "#F0F8FF", img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&q=70" },
-  { label: "Advance Weight Lifting", trainer: "Robert Jr.", bg: "#F5F0FF", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&q=70" },
+  { label: "Ultimate Body Workout", trainer: "Robert Fox", bg: "bg-orange-50", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=200&q=70" },
+  { label: "Body Weight Workout", trainer: "Jacob Jones", bg: "bg-blue-50", img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&q=70" },
+  { label: "Advance Weight Lifting", trainer: "Robert Jr.", bg: "bg-purple-50", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&q=70" },
 ];
 
 const BAR_HEIGHTS = [30, 55, 40, 70, 45, 90, 35, 60, 50, 80, 45, 65, 35, 75, 50];
 
+const AVATAR_URLS = [
+  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=40&q=60",
+  "https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=40&q=60",
+  "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=40&q=60",
+  "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=40&q=60",
+];
+
 // ── Mini sparkline bar chart ───────────────────────────────────
 function BarChart({ color, highlight }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 52, marginTop: 8 }}>
+    <div className="flex items-end gap-0.5 h-12 mt-2">
       {BAR_HEIGHTS.map((h, i) => (
-        <div key={i} style={{
-          flex: 1, height: `${h}%`, borderRadius: 3,
-          background: i === highlight ? color : "#F0F0F5",
-          transition: "all 0.2s",
-        }} />
+        <div
+          key={i}
+          className="flex-1 rounded-sm transition-all duration-200"
+          style={{
+            height: `${h}%`,
+            background: i === highlight ? color : "#F0F0F5",
+          }}
+        />
       ))}
     </div>
   );
@@ -51,10 +62,13 @@ function BarChart({ color, highlight }) {
 // ── Heartbeat line (SVG) ───────────────────────────────────────
 function HeartLine() {
   return (
-    <svg viewBox="0 0 200 52" style={{ width: "100%", height: 52, marginTop: 8 }}>
+    <svg viewBox="0 0 200 52" className="w-full h-12 mt-2">
       <polyline
         points="0,35 20,35 30,10 40,50 50,20 60,45 70,35 90,35 100,5 110,45 120,25 130,40 150,35 200,35"
-        fill="none" stroke="#FF6B6B" strokeWidth="2" strokeLinejoin="round"
+        fill="none"
+        stroke="#FF6B6B"
+        strokeWidth="2"
+        strokeLinejoin="round"
       />
       <circle cx="110" cy="5" r="4" fill="#FF6B6B" />
     </svg>
@@ -65,11 +79,11 @@ function HeartLine() {
 export default function Dashboard() {
   const [userName, setUserName] = useState("Ronald Jr.");
   const [loading, setLoading] = useState(true);
-  const [activeNav, setActiveNav] = useState("Overview");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   const navigate = useNavigate();
 
-  const NAV = ["Overview", "Activity", "Fitness Goal", "Achievement", "Courses", "Trainers"];
 
   // Fetch user name from dashboard API
   useEffect(() => {
@@ -91,384 +105,166 @@ export default function Dashboard() {
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#F4F5FA",
-      fontFamily: "'Nunito', 'Segoe UI', sans-serif",
-    }}>
+    <div className="bg-[#F4F5FA] font-sans overflow-y-auto scrollbar-hide">
 
-      {/* ── Topbar ── */}
-      <header style={{
-        background: "#fff",
-        borderBottom: "1px solid #EBEBF0",
-        padding: "0 32px",
-        height: 60,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        position: "sticky", top: 0, zIndex: 20,
-      }}>
-        {/* Logo */}
-        <div style={{
-          width: 36, height: 36, background: "#1A1A2E", borderRadius: 10,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          marginRight: 12, flexShrink: 0,
-        }}>
-          <span style={{ fontSize: 18 }}>⊛</span>
-        </div>
+      {/* ── Your existing NavBar component ── */}
+      <DashboardNavBar menuOpen={menuOpen} setMenuOpen={setMenuOpen}/>
 
-        {/* Nav tabs */}
-        <nav style={{ display: "flex", gap: 4, flex: 1 }}>
-          {NAV.map((n) => (
-            <button key={n} onClick={() => setActiveNav(n)} style={{
-              padding: "7px 18px",
-              borderRadius: 20,
-              border: "none",
-              cursor: "pointer",
-              fontWeight: activeNav === n ? 700 : 500,
-              fontSize: 14,
-              background: activeNav === n ? "#1A1A2E" : "transparent",
-              color: activeNav === n ? "#fff" : "#6B7280",
-              transition: "all 0.15s",
-            }}>{n}</button>
-          ))}
-        </nav>
-
-
-
-
-
-
-
-
-
-
-        <div>
-          <h2 onClick={()=>{navigate('/scanner')}}>Scan QR</h2>
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-        {/* Icons */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {["🔍", "💬", "🔔"].map((ic) => (
-            <button key={ic} style={{
-              width: 36, height: 36, border: "1.5px solid #EBEBF0",
-              borderRadius: "50%", background: "#fff", cursor: "pointer",
-              fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
-            }}>{ic}</button>
-          ))}
-          <img
-            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&q=80"
-            alt="avatar"
-            style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", border: "2px solid #7C6FFF" }}
+      {/* ── Hamburger mobile sidebar/drawer ── */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
           />
+          {/* Drawer */}
+          <aside className="relative z-50 w-64 bg-white h-full shadow-2xl flex flex-col p-6 gap-2">
+            <div className="flex items-center justify-between mb-6">
+              <span className="font-extrabold text-gray-900 text-lg">Menu</span>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            {["Overview", "Activity", "Fitness Goal", "Achievement", "Courses", "Trainers"].map((item) => (
+              <button
+                key={item}
+                onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); setMenuOpen(false); }}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                  item === "Overview"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+            <div className="mt-auto">
+              <button
+                onClick={() => { setShowQR(true); setMenuOpen(false); }}
+                className="w-full px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-sm hover:bg-indigo-100 transition-colors"
+              >
+                📷 Scan QR Code
+              </button>
+            </div>
+          </aside>
         </div>
-      </header>
+      )}
+
+      {/* ── QR Scanner modal ── */}
+      {showQR && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-extrabold text-gray-900 text-base">QR Scanner</h2>
+              <button
+                onClick={() => setShowQR(false)}
+                className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <QRScanner onClose={() => setShowQR(false)} />
+          </div>
+        </div>
+      )}
 
       {/* ── Page body ── */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 24px 40px" }}>
+      <div className="max-w-[1200px] mx-auto px-6 py-6 pb-12 space-y-5">
 
         {/* ── Hero row ── */}
-        <div style={{
-          background: "#fff", borderRadius: 20, padding: "24px 28px",
-          display: "flex", alignItems: "center", gap: 24, marginBottom: 20,
-          boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-        }}>
+        <div className="bg-white rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm">
           {/* Greeting */}
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: "#1A1A2E", margin: 0 }}>
+          <div className="flex-1">
+            <h1 className="text-2xl font-extrabold text-gray-900">
               {greeting}, {loading ? "…" : userName} 👋
             </h1>
-            <p style={{ color: "#9CA3AF", fontSize: 14, marginTop: 4 }}>Stay active and healthy to start your day.</p>
+            <p className="text-sm text-gray-400 mt-1">Stay active and healthy to start your day.</p>
           </div>
 
           {/* Marathon banner */}
-          <div style={{
-            flex: 2, background: "linear-gradient(135deg,#F0EEFF,#E8F0FF)",
-            borderRadius: 14, padding: "14px 20px",
-            display: "flex", alignItems: "center", gap: 16,
-          }}>
-            <span style={{ fontSize: 28 }}>🌐</span>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 800, fontSize: 15, color: "#1A1A2E", margin: 0 }}>
+          <div className="flex-[2] bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 flex items-center gap-4 w-full sm:w-auto">
+            <span className="text-3xl">🌐</span>
+            <div className="flex-1 min-w-0">
+              <p className="font-extrabold text-sm text-gray-900">
                 Worldwide 20km Marathon Competition 2024
               </p>
-              <p style={{ color: "#9CA3AF", fontSize: 12, marginTop: 2 }}>
+              <p className="text-xs text-gray-400 mt-0.5">
                 Learn more about this event you can visit the following links.
               </p>
             </div>
-            <button style={{
-              background: "#1A1A2E", color: "#fff", border: "none",
-              borderRadius: 10, padding: "9px 18px",
-              fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0,
-            }}>Learn More</button>
+            <button className="bg-gray-900 text-white rounded-xl px-4 py-2 font-bold text-sm flex-shrink-0 hover:bg-gray-700 transition-colors">
+              Learn More
+            </button>
           </div>
         </div>
 
         {/* ── Stats row ── */}
-        <div style={{
-          background: "#fff", borderRadius: 20, padding: "20px 24px",
-          display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0,
-          marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-        }}>
-          {STATS.map((s, i) => (
-            <div key={s.label} style={{
-              padding: "0 20px",
-              borderRight: i < 3 ? "1px solid #F0F0F5" : "none",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                <span style={{ fontSize: 20 }}>{s.icon}</span>
-                <span style={{ fontSize: 26, fontWeight: 800, color: "#1A1A2E" }}>{s.value}</span>
-                <span style={{ fontSize: 13, color: "#9CA3AF" }}>{s.unit}</span>
-                <span style={{
-                  marginLeft: "auto", fontSize: 11, fontWeight: 700,
-                  color: s.up ? "#22C55E" : "#EF4444",
-                  background: s.up ? "#DCFCE7" : "#FEE2E2",
-                  padding: "2px 6px", borderRadius: 20,
-                }}>{s.delta}</span>
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-gray-100">
+            {STATS.map((s) => (
+              <div key={s.label} className="p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xl">{s.icon}</span>
+                  <span className="text-2xl font-extrabold text-gray-900">{s.value}</span>
+                  <span className="text-xs text-gray-400">{s.unit}</span>
+                  <span
+                    className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                      s.up ? "text-green-600 bg-green-100" : "text-red-500 bg-red-100"
+                    }`}
+                  >
+                    {s.delta}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">{s.label}</p>
+                <p className="text-[11px] text-gray-400 mt-0.5 mb-1">
+                  {s.up ? "Better" : "Less"} than yesterday
+                </p>
+                {s.isHeart ? (
+                  <HeartLine />
+                ) : (
+                  <BarChart color={s.color} highlight={s.highlight} />
+                )}
               </div>
-              <p style={{ color: "#6B7280", fontSize: 12, margin: "0 0 2px" }}>{s.label}</p>
-              <p style={{ color: "#9CA3AF", fontSize: 11, margin: "0 0 6px" }}>
-                {s.up ? "Better" : "Less"} than yesterday
-              </p>
-              {s.label === "Heart Rate Monitor"
-                ? <HeartLine />
-                : <BarChart color={s.color} highlight={i === 1 ? 9 : i === 0 ? 7 : 8} />
-              }
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* ── Bottom 3-column grid ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 0.65fr 0.85fr", gap: 16 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.65fr_0.85fr] gap-4">
 
           {/* ── Col 1 ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="flex flex-col gap-4">
 
             {/* Weekly Goals */}
-            <div style={{
-              background: "#fff", borderRadius: 20, padding: "20px",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                <div style={{
-                  width: 40, height: 40, background: "#EEF0FF", borderRadius: 12,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                }}>➕</div>
-                <h3 style={{ fontWeight: 800, fontSize: 15, color: "#1A1A2E", flex: 1 }}>Your Weekly Goals</h3>
-                <button style={{ background: "none", border: "none", color: "#9CA3AF", fontSize: 20, cursor: "pointer" }}>⋮</button>
+            <div className="bg-white rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-lg">
+                  ➕
+                </div>
+                <h3 className="font-extrabold text-sm text-gray-900 flex-1">Your Weekly Goals</h3>
+                <button className="text-gray-400 text-xl hover:text-gray-600 transition-colors">⋮</button>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="grid grid-cols-2 gap-3">
                 {WEEKLY_GOALS.map((g) => (
-                  <div key={g.label} style={{
-                    background: g.color, borderRadius: 14, padding: "14px",
-                    display: "flex", alignItems: "center", gap: 12,
-                  }}>
-                    <div style={{
-                      width: 38, height: 38, background: g.iconBg + "30", borderRadius: 10,
-                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                    }}>{g.icon}</div>
+                  <div key={g.label} className={`${g.bg} rounded-xl p-3 flex items-center gap-3`}>
+                    <div className={`w-9 h-9 ${g.iconBg} bg-opacity-30 rounded-xl flex items-center justify-center text-lg`}>
+                      {g.icon}
+                    </div>
                     <div>
-                      <p style={{ color: "#6B7280", fontSize: 12, margin: 0 }}>{g.label}</p>
-                      <p style={{ fontWeight: 800, fontSize: 16, color: "#1A1A2E", margin: "2px 0 0" }}>
-                        {g.value}<span style={{ fontWeight: 400, fontSize: 11, color: "#9CA3AF" }}>{g.sub}</span>
+                      <p className="text-xs text-gray-500">{g.label}</p>
+                      <p className="font-extrabold text-base text-gray-900">
+                        {g.value}
+                        <span className="font-normal text-[10px] text-gray-400">{g.sub}</span>
                       </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Recommended Activity */}
-            <div style={{
-              background: "#fff", borderRadius: 20, padding: "20px",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                <div style={{
-                  width: 40, height: 40, background: "#FFF3E0", borderRadius: 12,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                }}>🌲</div>
-                <h3 style={{ fontWeight: 800, fontSize: 15, color: "#1A1A2E", flex: 1 }}>Recommended Activity</h3>
-                <button style={{ background: "none", border: "none", color: "#9CA3AF", fontSize: 20, cursor: "pointer" }}>⋮</button>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-                {ACTIVITIES.map((a) => (
-                  <div key={a.label} style={{
-                    background: a.bg, borderRadius: 16, padding: "14px",
-                    display: "flex", flexDirection: "column", gap: 10, overflow: "hidden", position: "relative",
-                  }}>
-                    <p style={{ fontWeight: 800, fontSize: 13, color: "#1A1A2E", margin: 0 }}>{a.label}</p>
-                    <p style={{ color: "#9CA3AF", fontSize: 11, margin: 0 }}>
-                      Build you body with proper care and guidelines from our mentor.
-                    </p>
-                    <p style={{ color: "#1A1A2E", fontSize: 11, fontWeight: 700, margin: 0 }}>
-                      {a.trainer} <span style={{ color: "#9CA3AF", fontWeight: 400 }}>(Fitness expert)</span>
-                    </p>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                      <button style={{
-                        background: "#1A1A2E", color: "#fff", border: "none",
-                        borderRadius: 10, padding: "7px 14px",
-                        fontWeight: 700, fontSize: 12, cursor: "pointer",
-                      }}>Join Now</button>
-                      <img src={a.img} alt={a.label}
-                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 10 }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Col 2: Popular Courses ── */}
-          <div style={{
-            background: "#fff", borderRadius: 20, padding: "20px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            display: "flex", flexDirection: "column",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-              <div style={{
-                width: 40, height: 40, background: "#DCFCE7", borderRadius: 12,
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-              }}>⚡</div>
-              <h3 style={{ fontWeight: 800, fontSize: 15, color: "#1A1A2E" }}>Popular Courses</h3>
-            </div>
-
-            {/* Course card */}
-            <div style={{
-              background: "linear-gradient(135deg,#F8F9FF,#EEF0FF)",
-              borderRadius: 16, padding: "18px", flex: 1,
-            }}>
-              <h4 style={{ fontWeight: 800, fontSize: 17, color: "#1A1A2E", marginBottom: 8 }}>
-                Fitness For Beginners
-              </h4>
-              <p style={{ color: "#6B7280", fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
-                1Million people already joined this courses. Here you can{" "}
-                <span style={{ color: "#7C6FFF", fontWeight: 700, cursor: "pointer" }}>Learn More</span>
-              </p>
-
-              {/* Avatars */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                <div style={{ display: "flex" }}>
-                  {[
-                    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=40&q=60",
-                    "https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=40&q=60",
-                    "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=40&q=60",
-                    "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=40&q=60",
-                  ].map((src, i) => (
-                    <img key={i} src={src} alt=""
-                      style={{
-                        width: 30, height: 30, borderRadius: "50%", objectFit: "cover",
-                        border: "2px solid #fff", marginLeft: i > 0 ? -10 : 0,
-                      }} />
-                  ))}
-                  <div style={{
-                    width: 30, height: 30, borderRadius: "50%",
-                    background: "#7C6FFF", color: "#fff",
-                    fontSize: 10, fontWeight: 700, border: "2px solid #fff",
-                    marginLeft: -10, display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>1M+</div>
-                </div>
-              </div>
-
-              {/* Dumbbell image */}
-              <div style={{ textAlign: "center", marginBottom: 16 }}>
-                <span style={{ fontSize: 56 }}>🏋️</span>
-              </div>
-
-              {/* Dots */}
-              <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
-                {[1, 2, 3, 4].map((d, i) => (
-                  <div key={d} style={{
-                    width: i === 0 ? 20 : 8, height: 8, borderRadius: 4,
-                    background: i === 0 ? "#1A1A2E" : "#D1D5DB",
-                  }} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Col 3: Trainers + Subscription ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-            {/* Popular Trainers */}
-            <div style={{
-              background: "#fff", borderRadius: 20, padding: "20px",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                <div style={{
-                  width: 40, height: 40, background: "#FFF3E0", borderRadius: 12,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                }}>🏆</div>
-                <h3 style={{ fontWeight: 800, fontSize: 15, color: "#1A1A2E", flex: 1 }}>Our Popular Trainers</h3>
-                <button style={{ background: "none", border: "none", color: "#7C6FFF", fontSize: 18, cursor: "pointer" }}>↗</button>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {TRAINERS.map((t) => (
-                  <div key={t.name} style={{
-                    display: "flex", alignItems: "center", gap: 12,
-                    padding: "10px 0",
-                    borderBottom: "1px solid #F4F5FA",
-                  }}>
-                    <img src={t.img} alt={t.name}
-                      style={{ width: 52, height: 52, borderRadius: 12, objectFit: "cover" }} />
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontWeight: 700, fontSize: 14, color: "#1A1A2E", margin: 0 }}>{t.name}</p>
-                      <p style={{ color: "#9CA3AF", fontSize: 12, margin: "2px 0 0" }}>
-                        {t.role} / {t.exp}
-                      </p>
-                    </div>
-                    <button style={{
-                      padding: "7px 16px",
-                      background: t.featured ? "#1A1A2E" : "#fff",
-                      color: t.featured ? "#fff" : "#1A1A2E",
-                      border: t.featured ? "none" : "1.5px solid #E5E7EB",
-                      borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: "pointer",
-                    }}>Book Now</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Subscription Plan */}
-            <div style={{
-              background: "linear-gradient(135deg,#1A1A2E,#2D2D44)",
-              borderRadius: 20, padding: "20px",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{
-                    width: 40, height: 40, background: "#FFF3E0", borderRadius: 12,
-                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                  }}>👑</div>
-                  <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Subscription Plan</span>
-                </div>
-                <button style={{
-                  background: "#fff", color: "#1A1A2E", border: "none",
-                  borderRadius: 10, padding: "7px 14px",
-                  fontWeight: 700, fontSize: 12, cursor: "pointer",
-                }}>Upgrade Now</button>
-              </div>
-              <h4 style={{ color: "#fff", fontWeight: 800, fontSize: 16, margin: "0 0 8px" }}>
-                Upgrade Your Subscription Plan
-              </h4>
-              <p style={{ color: "#9CA3AF", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-                Consider upgrading your plan to access all features in your fitness app.
-              </p>
-            </div>
-
           </div>
         </div>
       </div>
