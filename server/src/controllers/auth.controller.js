@@ -1,10 +1,11 @@
 const userModel = require('../models/user.model');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../services/email.service');
 const emailService = require("../utils/otp.utils");
 const otpModel = require('../models/otp.model');
 const attendanceModel = require('../models/attendance.model');
+const config = require('../config/config')
 
 
 async function userRegister(req, res) {
@@ -98,48 +99,59 @@ async function verifyEmail(req, res) {
 
 
 async function userLogin(req, res) {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
-    }
-
-    const user = await userModel.findOne({ email });
-
-    if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-    }
-
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    if (!user.verified) {
-        return res.status(403).json({ message: 'Email not verified' });
-    }
-
-    const token = jwt.sign(
-        { id: user?._id },
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-    );
-
-    res.cookie("token", token, {
-        httpOnly: true,
-        sameSite: "none",
-        secure: false
-    });
-    
-    res.status(200).json({
-        message: 'Login successful',
-        token,
-        user: {
-            id: user._id,
-            email: user.email,
-            name: user.name
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
         }
-    });
+
+        const user = await userModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        if (!user.verified) {
+            return res.status(403).json({ message: 'Email not verified' });
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                name: user.name 
+            },
+            config.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false
+        });
+
+
+
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }
 
 async function logoutUser(req, res) {

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 
 
 async function dashboard(req, res) {
+
     const userId = req.userId;
     try {
         const userName = await userModel.findOne({ "_id": userId }).select("name");
@@ -25,6 +26,7 @@ async function dashboard(req, res) {
 async function fit(req, res){
 
 }
+
 
 async function userAttendance(req, res){
     

@@ -64,7 +64,7 @@ const Login = () => {
                         <Silk
                             speed={5}
                             scale={1}
-                            color="#004cff"
+                            color="#0000"
                             noiseIntensity={0}
                             rotation={0}
                         ></Silk>
